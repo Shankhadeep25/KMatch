@@ -1,17 +1,43 @@
 const express = require('express');
 const {connectDB} = require('./config/database');
-const User = require('./models/user')
+const User = require('./models/user');
 
 const {adminAuth} = require('./middlewares/auth');
 const app = express();
 
+app.use(express.json());
+
+
+app.delete("/user", async (req, res) => {
+    const userId = req.body.userId;
+    try{
+        await User.findByIdAndDelete(userId)
+        res.send("User Deleted successfully")
+    }
+    catch (err) {
+        res.status(400).send("Unable to delete")
+    }
+});
+
+app.patch("/user", async (req, res) => {
+    const emailId = req.body.emailId;
+    const data = req.body
+
+    try{
+        const updateduser = await User.findOneAndUpdate({emailId : emailId}, data);
+        res.send("User updated successfully")
+
+        if(!updateduser){
+            res.status(404).send("No user found")
+        }
+    }
+    catch (err) {
+        res.status(400).send("oops something went wrong!")
+    }
+})
+
 app.post("/signup", async (req, res) => {
-    const user = new User({
-        firstName : "Satakshi",
-        lastName : "Roy",
-        emailId : "isha@gmail.com",
-        password : "456@gt"
-    });
+    const user = new User(req.body);
 
     try{
         await user.save();
