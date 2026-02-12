@@ -3,6 +3,24 @@ const express = require('express');
 const {adminAuth} = require('./middlewares/auth');
 const app = express();
 
+
+app.get("/user", (req,res) => {
+    try{
+        throw new Error("ABCD");
+        res.send("User datasend");
+    }
+    catch (err) {
+        res.status(500).send("something went wrong!!!");
+    }
+})
+
+
+app.use("/", (err, req, res, next) => {
+    if (err) {
+    res.status(500).send("Server failed");
+    }
+});
+
 app.use("/admin", adminAuth);
 
 app.use("/hello/ola", (req, res) => {
@@ -17,9 +35,6 @@ app.use("/hello/test", (req,res) => {
     res.send('you are on test')
 })
 
-app.use("/", (req, res) => {
-    res.send("hello from server");
-});
 
 app.listen(3000, () => {
     console.log('server is listening on port 3000');
