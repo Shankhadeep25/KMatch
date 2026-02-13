@@ -19,20 +19,38 @@ app.delete("/user", async (req, res) => {
     }
 });
 
-app.patch("/user", async (req, res) => {
-    const emailId = req.body.emailId;
+app.patch("/user/:userId", async (req, res) => {
+    const userId = req.params?.userId;
     const data = req.body
 
     try{
-        const updateduser = await User.findOneAndUpdate({emailId : emailId}, data);
+        const ALLOWED_UPDATES = [
+          "age",
+          "photoUrl",
+          "gender",
+          "about",
+          "skills",
+        ];
+
+        const isUpdateAllowed = Object.keys(data).every((k) => ALLOWED_UPDATES.includes(k));
+
+        if(!isUpdateAllowed){
+            throw new Error("Update not allowed")
+        }
+        const updateduser = await User.findByIdAndUpdate(userId, data);
+        runValidators: true;
         res.send("User updated successfully")
 
         if(!updateduser){
             res.status(404).send("No user found")
         }
+
+        if(data?.skills.length > 10){
+            throw new Error("Skills exceeded 10")
+        }
     }
     catch (err) {
-        res.status(400).send("oops something went wrong!")
+        res.status(400).send("oops something went wrong!"+ err.message)
     }
 })
 
