@@ -24,11 +24,11 @@ const UserSchema = new Schema({
   },
   password: { type: String, 
     required: true ,
-    validate(value) {
-      if(!validator.isStrongPassword(value)){
-        throw new Error("Enter a strong password" + value);
-      }
-    }  
+    // validate(value) {
+    //   if(!validator.isStrongPassword(value)){
+    //     throw new Error("Enter a strong password" + value);
+    //   }
+    // }  
   },
   age: { type: Number, min: 18 },
   photoUrl: {
