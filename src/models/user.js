@@ -36,10 +36,9 @@ const UserSchema = new Schema({
     default: "https://www.freepik.com/free-photos-vectors/default-user",
   },
   gender:  {type: String,
-    validate(value) {
-        if(!["male","female","others"].includes(value)){
-            throw new Error("Gender data not valid!");
-        }
+    enum : {
+      values : ["male","female","others"],
+      message: `{VALUE} is not a valid gender type`
     }
   },
   skills: { type: [String] },
