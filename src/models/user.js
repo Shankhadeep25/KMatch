@@ -5,48 +5,52 @@ const bcrypt = require('bcrypt')
 
 const { Schema } = mongoose;
 
-const UserSchema = new Schema({
-  firstName: { type: String, maxLength: 20 },
-  lastName: { type: String,
-    required : true,
+const UserSchema = new Schema(
+  {
+    firstName: { type: String, maxLength: 20 },
+    lastName: { type: String, required: true },
+    emailId: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      unique: true,
+      required: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid Email" + value);
+        }
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      // validate(value) {
+      //   if(!validator.isStrongPassword(value)){
+      //     throw new Error("Enter a strong password" + value);
+      //   }
+      // }
+    },
+    age: { type: Number, min: 18 },
+    photoUrl: {
+      type: String,
+      default:
+        "https://static.vecteezy.com/system/resources/thumbnails/001/840/618/small/picture-profile-icon-male-icon-human-or-people-sign-and-symbol-free-vector.jpg",
+    },
+    gender: {
+      type: String,
+      enum: {
+        values: ["male", "female", "others"],
+        message: `{VALUE} is not a valid gender type`,
+      },
+    },
+    skills: { type: [String] },
+    about: {
+      type: String,
+      default: "This is default about user!",
+    },
   },
-  emailId: {
-    type: String,
-    trim: true,
-    lowercase: true,
-    unique: true,
-    required: true,
-    validate(value) {
-      if(!validator.isEmail(value)){
-        throw new Error("Invalid Email" + value);
-      }
-    }
-  },
-  password: { type: String, 
-    required: true ,
-    // validate(value) {
-    //   if(!validator.isStrongPassword(value)){
-    //     throw new Error("Enter a strong password" + value);
-    //   }
-    // }  
-  },
-  age: { type: Number, min: 18 },
-  photoUrl: {
-    type: String,
-    default: "https://www.freepik.com/free-photos-vectors/default-user",
-  },
-  gender:  {type: String,
-    enum : {
-      values : ["male","female","others"],
-      message: `{VALUE} is not a valid gender type`
-    }
-  },
-  skills: { type: [String] },
-  about: {
-    type: String,
-    default: "This is default about user!",
-  },
-}, {timestamps: true});
+  { timestamps: true },
+);
 
 UserSchema.methods.getJWT = async function () {
   const user = this;
